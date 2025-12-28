@@ -50,17 +50,18 @@ char password[] = "KxNk9xMbs9ZcSu2qvD";  // your network key
 // WiFiClient client;
 
 // For HTTPS requests
-//WiFiClientSecure client;
-WiFiClient client;
+WiFiClientSecure client;
+//WiFiClient client;
 
 
 // Just the base of the URL you want to connect to
-#define TEST_HOST "192.168.1.38"
+#define TEST_HOST "sisyphusvaloranttracker.onrender.com"
 
 
 // Root cert of server we are connecting to
 // Baltimore CyberTrust Root - Expires 12 May 2025
 // (FYI, from a security point of view you should not trust certs from other people, including me!)
+/*
 const char *server_cert = "-----BEGIN CERTIFICATE-----\n"
 "MIICnzCCAiWgAwIBAgIQf/MZd5csIkp2FV0TttaF4zAKBggqhkjOPQQDAzBHMQsw\n"
 "CQYDVQQGEwJVUzEiMCAGA1UEChMZR29vZ2xlIFRydXN0IFNlcnZpY2VzIExMQzEU\n"
@@ -78,7 +79,7 @@ const char *server_cert = "-----BEGIN CERTIFICATE-----\n"
 "sQIwJonMaAFi54mrfhfoFNZEfuNMSQ6/bIBiNLiyoX46FohQvKeIoJ99cx7sUkFN\n"
 "7uJW\n"
 "-----END CERTIFICATE-----\n";
-
+*/
 
 void setup() {
 
@@ -125,7 +126,7 @@ void loop() {
 void makeHTTPRequest() {
 
   // Opening connection to server (Use 80 as port if HTTP)
-  if (!client.connect(TEST_HOST, 5000)) //443 for https
+  if (!client.connect(TEST_HOST, 443)) //443 for https
   {
     Serial.println(F("Connection failed"));
     return;
@@ -143,8 +144,6 @@ void makeHTTPRequest() {
   //Headers
   client.print(F("Host: "));
   client.println(TEST_HOST);
-
-  //client.println(F("User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"));//put a human mask on
 
   client.println(F("Cache-Control: no-cache"));
 

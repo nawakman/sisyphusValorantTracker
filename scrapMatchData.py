@@ -14,6 +14,13 @@ def get_stats():
     
     try:
         response = scraper.get(url)
+
+        if response.status_code != 200:
+            print(f"BLOCKED! Status: {response.status_code}", flush=True)
+            # This prints the first 200 characters of the block page to your logs
+            print(f"Server Response: {response.text[:200]}", flush=True)
+            return "server error: connection blocked"
+
         data = response.json() # Convert the response to a Python Dictionary
         
         # Extract data
@@ -23,13 +30,13 @@ def get_stats():
 
         if current_id != last_match_id:
             last_match_id = current_id
-            print(f"new Match Detected")
-            print(f"sending to ESP32: {result}")
+            print(f"new Match Detected",flush=True)
+            print(f"sending to ESP32: {result}",flush=True)
             return str(result)
         else:
             return "none" 
     except Exception as e:
-        print(e)
+        print(e,flush=True)#flush to instantly print the log 
         return "server error: JSON parsing error"
 
 if __name__ == '__main__':
