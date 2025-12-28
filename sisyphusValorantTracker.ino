@@ -106,7 +106,7 @@ void setup() {
   // This will verify the server is trusted.
   //client.setCACert(server_cert);
   //OR
-  //client.setInsecure();
+  client.setInsecure();
 
   // If you don't want to verify the server
   // Unlike the fingerprint method of the ESP8266 which expires frequently

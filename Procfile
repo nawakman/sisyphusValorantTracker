@@ -1,1 +1,1 @@
-web: gunicorn app:scrapMatchData
+web: gunicorn scrapMatchData:app
