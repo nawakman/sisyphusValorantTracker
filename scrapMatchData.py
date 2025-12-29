@@ -1,6 +1,25 @@
 import cloudscraper
 from flask import Flask
 from waitress import serve
+import os
+import sys
+
+def check_single_instance():
+    if os.path.exists(lock_file):
+        # Try to remove it. If we can't, another instance is using it.
+        try:
+            os.remove(lock_file)
+        except OSError:
+            print("Script is already running! Exiting...")
+            sys.exit(0)
+    # Create the lock file (first execution)
+    global f
+    f=open(lock_file, 'w')# Windows won't let another script delete a file that is 'open'
+
+##### RUN ONLY ONCE #####
+lock_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "scrapMatchData.lock")
+check_single_instance()
+
 
 app = Flask(__name__)
 scraper = cloudscraper.create_scraper()
