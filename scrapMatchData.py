@@ -1,8 +1,10 @@
 import cloudscraper
 from flask import Flask, jsonify
+import time
+import random
 
 app = Flask(__name__)
-scraper = cloudscraper.create_scraper() # This mimics a real browser perfectly
+scraper = cloudscraper.create_scraper(interpreter='js2py') # This mimics a real browser perfectly
 
 last_match_id = ""
 
@@ -11,7 +13,9 @@ def get_stats():
     global last_match_id
     # The exact URL you were trying to reach
     url = "https://api.tracker.gg/api/v2/valorant/standard/matches/riot/nawakman%2329232?platform=pc&season=4c4b8cff-43eb-13d3-8f14-96b783c90cd2&type=competitive"
-    
+
+    time.sleep(random.uniform(0,60))#add random delay to confuse cloudflare
+
     try:
         response = scraper.get(url)
 
