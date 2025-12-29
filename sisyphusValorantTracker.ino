@@ -55,7 +55,7 @@ WiFiClientSecure client;
 
 
 // Just the base of the URL you want to connect to
-#define TEST_HOST "sisyphusvaloranttracker.onrender.com"
+#define TEST_HOST "unscintillating-angelica-gabelled.ngrok-free.dev"
 
 
 // Root cert of server we are connecting to
