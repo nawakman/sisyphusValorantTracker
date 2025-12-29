@@ -30,21 +30,13 @@
 
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
-
-
-// ----------------------------
-// Additional Libraries - each one of these will need to be installed.
-// ----------------------------
-
-#include <ArduinoJson.h>
-// Library used for parsing Json from the API responses
-
-// Search for "Arduino Json" in the Arduino Library manager
-// https://github.com/bblanchon/ArduinoJson
+#include <ESP32Servo.h>
+//#include <ArduinoJson.h>
 
 //------- Replace the following! ------
 char ssid[] = "Livebox-4A40";       // your network SSID (name)
 char password[] = "KxNk9xMbs9ZcSu2qvD";  // your network key
+const int servoSpeed=40;
 
 // For Non-HTTPS requests
 // WiFiClient client;
@@ -52,34 +44,11 @@ char password[] = "KxNk9xMbs9ZcSu2qvD";  // your network key
 // For HTTPS requests
 WiFiClientSecure client;
 //WiFiClient client;
+Servo servo;
 
 
 // Just the base of the URL you want to connect to
 #define TEST_HOST "unscintillating-angelica-gabelled.ngrok-free.dev"
-
-
-// Root cert of server we are connecting to
-// Baltimore CyberTrust Root - Expires 12 May 2025
-// (FYI, from a security point of view you should not trust certs from other people, including me!)
-/*
-const char *server_cert = "-----BEGIN CERTIFICATE-----\n"
-"MIICnzCCAiWgAwIBAgIQf/MZd5csIkp2FV0TttaF4zAKBggqhkjOPQQDAzBHMQsw\n"
-"CQYDVQQGEwJVUzEiMCAGA1UEChMZR29vZ2xlIFRydXN0IFNlcnZpY2VzIExMQzEU\n"
-"MBIGA1UEAxMLR1RTIFJvb3QgUjQwHhcNMjMxMjEzMDkwMDAwWhcNMjkwMjIwMTQw\n"
-"MDAwWjA7MQswCQYDVQQGEwJVUzEeMBwGA1UEChMVR29vZ2xlIFRydXN0IFNlcnZp\n"
-"Y2VzMQwwCgYDVQQDEwNXRTEwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARvzTr+\n"
-"Z1dHTCEDhUDCR127WEcPQMFcF4XGGTfn1XzthkubgdnXGhOlCgP4mMTG6J7/EFmP\n"
-"LCaY9eYmJbsPAvpWo4H+MIH7MA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggr\n"
-"BgEFBQcDAQYIKwYBBQUHAwIwEgYDVR0TAQH/BAgwBgEB/wIBADAdBgNVHQ4EFgQU\n"
-"kHeSNWfE/6jMqeZ72YB5e8yT+TgwHwYDVR0jBBgwFoAUgEzW63T/STaj1dj8tT7F\n"
-"avCUHYwwNAYIKwYBBQUHAQEEKDAmMCQGCCsGAQUFBzAChhhodHRwOi8vaS5wa2ku\n"
-"Z29vZy9yNC5jcnQwKwYDVR0fBCQwIjAgoB6gHIYaaHR0cDovL2MucGtpLmdvb2cv\n"
-"ci9yNC5jcmwwEwYDVR0gBAwwCjAIBgZngQwBAgEwCgYIKoZIzj0EAwMDaAAwZQIx\n"
-"AOcCq1HW90OVznX+0RGU1cxAQXomvtgM8zItPZCuFQ8jSBJSjz5keROv9aYsAm5V\n"
-"sQIwJonMaAFi54mrfhfoFNZEfuNMSQ6/bIBiNLiyoX46FohQvKeIoJ99cx7sUkFN\n"
-"7uJW\n"
-"-----END CERTIFICATE-----\n";
-*/
 
 void setup() {
 
@@ -101,10 +70,8 @@ void setup() {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-  //--------
+  servo.attach(13, 500, 2400); // Attach with min/max pulse widths
 
-  // Checking the cert is the best way on an ESP32
-  // This will verify the server is trusted.
   //client.setCACert(server_cert);
   //OR
   client.setInsecure();
@@ -173,5 +140,26 @@ void makeHTTPRequest() {
 
   String response = client.readString();
   response.trim(); // Vital: removes hidden \r or \n characters
+  servo.attach(13);
+  if(response="victory"){
+    servo.write(90+servoSpeed);
+    delay(2000);
+    servo.write(0);
+  }else if (response="defeat"){
+    servo.write(90-servoSpeed);
+    delay(2000);
+    servo.write(0);
+  }else if (response="draw"){
+    servo.write(90-servoSpeed);
+    delay(500);
+    servo.write(90+servoSpeed);
+    delay(500);
+    servo.write(90-servoSpeed);
+    delay(500);
+    servo.write(90+servoSpeed);
+    delay(500);
+    servo.write(0);
+  }
+  servo.detach();
   Serial.println(response);
 }
