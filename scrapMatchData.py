@@ -23,11 +23,16 @@ check_single_instance()
 
 app = Flask(__name__)
 scraper = cloudscraper.create_scraper()
-last_match_id = ""
+try:
+    with open("lastMatchId.txt") as id:
+        lastMatchId = id.read()
+except Exception as e:
+    print("no lastMatchId.txt: lastMatchId set to empty string")
+    lastMatchId=""
 
 @app.route('/get-stats')
 def get_stats():
-    global last_match_id
+    global lastMatchId
     # The exact URL you were trying to reach
     url = "https://api.tracker.gg/api/v2/valorant/standard/matches/riot/nawakman%2329232?platform=pc&season=4c4b8cff-43eb-13d3-8f14-96b783c90cd2&type=competitive"
   
@@ -46,17 +51,18 @@ def get_stats():
         current_id = current_match['attributes']['id']
         result = current_match['metadata']['result'] # e.g., "victory"
 
-        if current_id != last_match_id:
-            last_match_id = current_id
+        if current_id != lastMatchId:
+            lastMatchId = current_id
             print(f"new match detected",flush=True)
             print(f"sending to ESP32: {result}",flush=True)
+            with open("lastMatchId.txt", "w") as id:
+                id.write(str(current_id))
             return str(result)
         else:
             return "none" 
     except Exception as e:
         print(e,flush=True)#flush to instantly print the log 
         return "server error: JSON parsing error"
-    return "server error: no successful attempts"
 
 
 
