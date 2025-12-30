@@ -76,22 +76,18 @@ void setup() {
   //OR
   client.setInsecure();
 
-  // If you don't want to verify the server
-  // Unlike the fingerprint method of the ESP8266 which expires frequently
-  // the cert lasts years, so I don't see much reason to ever
-  // use this on the ESP32
-  // client.setInsecure();
+  makeHTTPRequest();
+  esp_sleep_enable_timer_wakeup(10*60*1000000);//1 seconds = 1,000,000 microseconds
+  esp_deep_sleep_start();
 }
 
+void loop(){//because it needs to exist apparently
 
-
-void loop() {
-  makeHTTPRequest();
-  delay(10*60*1000);
 }
 
 void makeHTTPRequest() {
-
+  const unsigned long timeout = 5000; //timeout before giving up on response
+  unsigned long startTime = millis();
   // Opening connection to server (Use 80 as port if HTTP)
   if (!client.connect(TEST_HOST, 443)) //443 for https
   {
@@ -119,7 +115,16 @@ void makeHTTPRequest() {
     Serial.println(F("Failed to send request"));
     return;
   }
-  //delay(100);
+  
+  while (client.available() == 0) {
+    if (millis() - startTime > timeout) {
+      Serial.println(F("http response timeout"));
+      client.stop();
+      return;
+    }
+    delay(10);
+  }
+
   // Check HTTP status
   char status[32] = {0};
   client.readBytesUntil('\r', status, sizeof(status));
@@ -140,16 +145,21 @@ void makeHTTPRequest() {
 
   String response = client.readString();
   response.trim(); // Vital: removes hidden \r or \n characters
+  Serial.println(response);
+  servoMovements(response);
+}
+
+void servoMovements(String response){
   servo.attach(13);
-  if(response="victory"){
+  if(response=="victory"){
     servo.write(90+servoSpeed);
     delay(2000);
     servo.write(0);
-  }else if (response="defeat"){
+  }else if (response=="defeat"){
     servo.write(90-servoSpeed);
     delay(2000);
     servo.write(0);
-  }else if (response="draw"){
+  }else if (response=="draw"){
     servo.write(90-servoSpeed);
     delay(500);
     servo.write(90+servoSpeed);
@@ -161,5 +171,4 @@ void makeHTTPRequest() {
     servo.write(0);
   }
   servo.detach();
-  Serial.println(response);
 }
